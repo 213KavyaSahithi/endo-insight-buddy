@@ -1,33 +1,50 @@
-# Welcome to your Lovable project
+## ENDO-INSIGHT-BUDDY
 
-## Project info
+Endo Insight Buddy is a privacy-first AI-powered web application designed to help users understand their potential risk for endometriosis through an interactive and educational assessment.
+It provides personalized risk insights, visual explanations, and evidence-based recommendations, while ensuring 100% data privacy — your data never leaves your browser.
 
-**URL**: https://lovable.dev/projects/b2743682-dc0b-4347-9aa2-7576a837decf
+## How it Works?
 
-## How can I edit this code?
+**1️⃣ Data Collection:**
+You provide basic health details such as:
+- Age
+- Symptom severity (pain, fatigue, irregular cycles, etc.)
+- Medical and family history
+- Optional biomarker data (CA-125, CRP levels)
 
-There are several ways of editing your application.
+**2️⃣ Risk Analysis:**
 
-**Use Lovable**
+Our AI model evaluates your input based on clinical research data and known risk factors associated with endometriosis.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/b2743682-dc0b-4347-9aa2-7576a837decf) and start prompting.
+**3️⃣ Visual Results:**
+You’ll receive:
+- A risk percentage (low, moderate, or high)
+- Visual insights highlighting key contributing factors
+- Personalized recommendations for next steps and self-care
 
-Changes made via Lovable will be committed automatically to this repo.
+## Scientific Background
 
-**Use your preferred IDE**
+Endometriosis affects roughly 1 in 10 women of reproductive age and often takes years to diagnose due to non-specific symptoms.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+This AI model considers:
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- Symptom severity: dysmenorrhea, pelvic pain, dyspareunia
+- Family history of endometriosis
+- Menstrual cycle characteristics (age of menarche, duration, regularity)
+- Biomarker levels (CA-125, CRP — optional inputs)
+- Associated conditions (e.g., PCOS, infertility)
+- Lifestyle and mental health factors
+
+## Use your preferred IDE
 
 Follow these steps:
 
 ```sh
 # Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+git clone https://github.com/213KavyaSahithi/endo-insight-buddy.git
 
 # Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+cd endo-insight-buddy
 
 # Step 3: Install the necessary dependencies.
 npm i
@@ -36,23 +53,7 @@ npm i
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
+## Tech Stack
 
 - Vite
 - TypeScript
@@ -60,14 +61,10 @@ This project is built with:
 - shadcn-ui
 - Tailwind CSS
 
-## How can I deploy this project?
 
-Simply open [Lovable](https://lovable.dev/projects/b2743682-dc0b-4347-9aa2-7576a837decf) and click on Share -> Publish.
+## NOTE
 
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+- This tool does not provide a medical diagnosis
+- Only a qualified healthcare professional can diagnose endometriosis (typically via laparoscopy)
+- Results are based on statistical risk patterns and may not apply to all individuals
+- Always seek medical advice if you experience persistent symptoms
