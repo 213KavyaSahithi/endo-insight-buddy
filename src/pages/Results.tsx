@@ -6,11 +6,30 @@ import { Heart, Download, Home, AlertCircle } from "lucide-react";
 import RiskScore from "@/components/results/RiskScore";
 import FactorsChart from "@/components/results/FactorsChart";
 import Recommendations from "@/components/results/Recommendations";
+import { exportToPDF } from "@/utils/pdfExport";
+import { useToast } from "@/hooks/use-toast";
 
 const Results = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const assessment = location.state?.assessment as AssessmentHistory;
+
+  const handleExportPDF = () => {
+    try {
+      exportToPDF(assessment);
+      toast({
+        title: "PDF Exported",
+        description: "Your assessment report has been downloaded successfully.",
+      });
+    } catch (error) {
+      toast({
+        title: "Export Failed",
+        description: "There was an error exporting the PDF. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   if (!assessment) {
     return (
@@ -44,7 +63,7 @@ const Results = () => {
                 Home
               </Link>
             </Button>
-            <Button>
+            <Button onClick={handleExportPDF}>
               <Download className="mr-2 h-4 w-4" />
               Export PDF
             </Button>
