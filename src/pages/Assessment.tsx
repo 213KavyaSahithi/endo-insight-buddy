@@ -6,7 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { AssessmentData } from "@/types/assessment";
 import { predictEndometriosisRisk } from "@/utils/prediction";
 import { saveAssessment } from "@/utils/storage";
-import { Heart } from "lucide-react";
+
 import BasicInfoForm from "@/components/assessment/BasicInfoForm";
 import SymptomsForm from "@/components/assessment/SymptomsForm";
 import BiomarkersForm from "@/components/assessment/BiomarkersForm";
@@ -73,7 +73,6 @@ const Assessment = () => {
       <header className="border-b border-border bg-card sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center gap-2">
-            <Heart className="h-6 w-6 text-primary" />
             <span className="text-xl font-bold text-foreground">EndoAI Assessment</span>
           </div>
         </div>

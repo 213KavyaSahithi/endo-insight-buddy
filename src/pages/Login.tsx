@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Heart } from "lucide-react";
+
 import { saveUserSession } from "@/utils/storage";
 import { useToast } from "@/hooks/use-toast";
 
@@ -45,7 +45,6 @@ const Login = () => {
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-md p-8">
         <div className="text-center mb-8">
-          <Heart className="h-12 w-12 text-primary mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-foreground mb-2">Welcome to EndoAI</h1>
           <p className="text-muted-foreground">Sign in to save and track your assessments</p>
         </div>

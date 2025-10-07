@@ -2,7 +2,7 @@ import { useLocation, useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { AssessmentHistory } from "@/types/assessment";
-import { Heart, Download, Home, AlertCircle } from "lucide-react";
+import { Download, Home, AlertCircle } from "lucide-react";
 import RiskScore from "@/components/results/RiskScore";
 import FactorsChart from "@/components/results/FactorsChart";
 import Recommendations from "@/components/results/Recommendations";
@@ -53,7 +53,6 @@ const Results = () => {
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <Heart className="h-6 w-6 text-primary" />
             <span className="text-xl font-bold">Assessment Results</span>
           </div>
           <div className="flex gap-2">

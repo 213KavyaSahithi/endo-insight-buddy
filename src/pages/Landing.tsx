@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Link } from "react-router-dom";
-import { Activity, Brain, FileText, Heart, ShieldCheck, TrendingUp } from "lucide-react";
+import { Activity, Brain, FileText, ShieldCheck, TrendingUp } from "lucide-react";
 
 const Landing = () => {
   return (
@@ -10,7 +10,6 @@ const Landing = () => {
       <header className="border-b border-border bg-card">
         <nav className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <Heart className="h-6 w-6 text-primary" />
             <span className="text-xl font-bold text-foreground">EndoAI</span>
           </div>
           <div className="flex gap-3">

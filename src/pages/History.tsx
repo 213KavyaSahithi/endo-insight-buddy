@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { getAssessmentHistory, clearHistory } from "@/utils/storage";
-import { Heart, Home, Eye, Trash2, AlertCircle } from "lucide-react";
+import { Home, Eye, Trash2, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 
@@ -45,7 +45,6 @@ const History = () => {
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <Heart className="h-6 w-6 text-primary" />
             <span className="text-xl font-bold">Assessment History</span>
           </div>
           <Button variant="outline" asChild>
