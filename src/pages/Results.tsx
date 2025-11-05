@@ -2,18 +2,21 @@ import { useLocation, useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { AssessmentHistory } from "@/types/assessment";
-import { Download, Home, AlertCircle } from "lucide-react";
+import { Download, Home, AlertCircle, MessageCircle } from "lucide-react";
 import RiskScore from "@/components/results/RiskScore";
 import FactorsChart from "@/components/results/FactorsChart";
 import Recommendations from "@/components/results/Recommendations";
+import ChatInterface from "@/components/chatbot/ChatInterface";
 import { exportToPDF } from "@/utils/pdfExport";
 import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 const Results = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
   const assessment = location.state?.assessment as AssessmentHistory;
+  const [showChat, setShowChat] = useState(false);
 
   const handleExportPDF = () => {
     try {
@@ -70,7 +73,7 @@ const Results = () => {
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8 max-w-5xl">
+      <div className="container mx-auto px-4 py-8 max-w-5xl relative">
         <div className="mb-8">
           <p className="text-sm text-muted-foreground mb-2">
             Assessment Date: {new Date(assessment.date).toLocaleDateString()}
@@ -80,30 +83,53 @@ const Results = () => {
           </h1>
         </div>
 
-        <div className="space-y-6">
-          <RiskScore result={result} />
-          
-          <FactorsChart factors={result.factors} />
-          
-          <Recommendations recommendations={result.recommendations} />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
+            <RiskScore result={result} />
+            
+            <FactorsChart factors={result.factors} />
+            
+            <Recommendations recommendations={result.recommendations} />
 
-          <Card className="p-6 bg-muted border-accent">
-            <h3 className="font-semibold text-foreground mb-2">Important Disclaimer</h3>
-            <p className="text-sm text-muted-foreground">
-              This AI-powered assessment is designed to provide informational insights only. 
-              It should not be used as a substitute for professional medical diagnosis or treatment. 
-              If you have concerns about endometriosis or related symptoms, please consult a 
-              qualified healthcare provider for proper evaluation and care.
-            </p>
-          </Card>
+            <Card className="p-6 bg-muted border-accent">
+              <h3 className="font-semibold text-foreground mb-2">Important Disclaimer</h3>
+              <p className="text-sm text-muted-foreground">
+                This AI-powered assessment is designed to provide informational insights only. 
+                It should not be used as a substitute for professional medical diagnosis or treatment. 
+                If you have concerns about endometriosis or related symptoms, please consult a 
+                qualified healthcare provider for proper evaluation and care.
+              </p>
+            </Card>
 
-          <div className="flex gap-4 justify-center pt-4">
-            <Button variant="outline" onClick={() => navigate('/assessment')}>
-              Take New Assessment
-            </Button>
-            <Button variant="outline" onClick={() => navigate('/history')}>
-              View History
-            </Button>
+            <div className="flex gap-4 justify-center pt-4">
+              <Button variant="outline" onClick={() => navigate('/assessment')}>
+                Take New Assessment
+              </Button>
+              <Button variant="outline" onClick={() => navigate('/history')}>
+                View History
+              </Button>
+            </div>
+          </div>
+
+          <div className="lg:col-span-1">
+            {showChat ? (
+              <div className="sticky top-4">
+                <ChatInterface assessment={assessment} onClose={() => setShowChat(false)} />
+              </div>
+            ) : (
+              <div className="sticky top-4">
+                <Card className="p-6 text-center">
+                  <MessageCircle className="h-12 w-12 text-primary mx-auto mb-4" />
+                  <h3 className="font-semibold text-foreground mb-2">Have Questions?</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Ask our AI assistant about your assessment results and endometriosis.
+                  </p>
+                  <Button onClick={() => setShowChat(true)} className="w-full">
+                    Start Chat
+                  </Button>
+                </Card>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -12,14 +12,9 @@ const Landing = () => {
           <div className="flex items-center gap-2">
             <span className="text-xl font-bold text-foreground">EndoAI</span>
           </div>
-          <div className="flex gap-3">
-            <Button variant="ghost" asChild>
-              <Link to="/login">Login</Link>
-            </Button>
-            <Button asChild>
-              <Link to="/assessment">Start Assessment</Link>
-            </Button>
-          </div>
+          <Button asChild>
+            <Link to="/assessment">Start Assessment</Link>
+          </Button>
         </nav>
       </header>
 
