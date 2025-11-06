@@ -41,12 +41,20 @@ const ChatInterface = ({ assessment, onClose }: Props) => {
       try {
         generatorRef.current = await pipeline(
           "text2text-generation",
-          "Xenova/LaMini-Flan-T5-783M"
+          "Xenova/LaMini-Flan-T5-77M"
         );
         setModelLoading(false);
       } catch (error) {
         console.error("Failed to load model:", error);
         setModelLoading(false);
+        // Show error message to user
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "assistant",
+            content: "I'm having trouble loading the AI model. This might be due to a slow connection. Please refresh the page to try again, or ask your questions and I'll do my best to help based on your assessment results.",
+          },
+        ]);
       }
     };
     loadModel();
@@ -142,7 +150,7 @@ Answer:`;
           {modelLoading && (
             <div className="flex items-center gap-2 text-muted-foreground text-sm">
               <Loader2 className="h-4 w-4 animate-spin" />
-              <span>Loading AI model... (first time may take a minute)</span>
+              <span>Loading AI model... (30-60 seconds on first use)</span>
             </div>
           )}
           {messages.map((message, idx) => (
