@@ -3,8 +3,9 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, X } from "lucide-react";
+import { Send, X, Loader2 } from "lucide-react";
 import { AssessmentHistory } from "@/types/assessment";
+import { pipeline } from "@huggingface/transformers";
 
 interface Message {
   role: "user" | "assistant";
@@ -24,7 +25,10 @@ const ChatInterface = ({ assessment, onClose }: Props) => {
     },
   ]);
   const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [modelLoading, setModelLoading] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const generatorRef = useRef<any>(null);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -32,61 +36,57 @@ const ChatInterface = ({ assessment, onClose }: Props) => {
     }
   }, [messages]);
 
-  const generateResponse = (userMessage: string): string => {
-    const lowerMessage = userMessage.toLowerCase();
-    
-    // Risk level questions
-    if (lowerMessage.includes("risk") && (lowerMessage.includes("what") || lowerMessage.includes("mean"))) {
-      return `Your risk level is ${assessment.result.riskLevel} with a probability of ${Math.round(assessment.result.probability * 100)}%. This means ${
-        assessment.result.riskLevel === "low" 
-          ? "you have a lower likelihood of endometriosis based on the factors assessed."
-          : assessment.result.riskLevel === "medium"
-          ? "you have some risk factors that suggest you should monitor your symptoms and consult with a healthcare provider."
-          : "you have several risk factors that warrant medical consultation for proper diagnosis and treatment options."
-      }`;
+  useEffect(() => {
+    const loadModel = async () => {
+      try {
+        generatorRef.current = await pipeline(
+          "text2text-generation",
+          "Xenova/LaMini-Flan-T5-783M"
+        );
+        setModelLoading(false);
+      } catch (error) {
+        console.error("Failed to load model:", error);
+        setModelLoading(false);
+      }
+    };
+    loadModel();
+  }, []);
+
+  const generateResponse = async (userMessage: string): Promise<string> => {
+    if (!generatorRef.current) {
+      return "AI model is still loading, please wait a moment...";
     }
 
-    // Contributing factors
-    if (lowerMessage.includes("factor") || lowerMessage.includes("contribute")) {
-      const topFactors = assessment.result.factors
-        .sort((a, b) => b.impact - a.impact)
-        .slice(0, 3)
-        .map(f => `${f.feature} (${Math.round(f.impact * 100)}% impact)`)
-        .join(", ");
-      return `The main factors contributing to your assessment are: ${topFactors}. These were identified based on your responses about symptoms, medical history, and biomarkers.`;
-    }
+    const contextPrompt = `You are a helpful medical assistant specializing in endometriosis. 
+The patient has completed a risk assessment with the following results:
+- Risk Level: ${assessment.result.riskLevel}
+- Probability: ${Math.round(assessment.result.probability * 100)}%
+- Confidence: ${Math.round(assessment.result.confidence * 100)}%
+- Stage: ${assessment.result.stage}
+- Key Contributing Factors: ${assessment.result.factors.slice(0, 3).map(f => f.feature).join(", ")}
+- Recommendations: ${assessment.result.recommendations.join("; ")}
 
-    // Recommendations
-    if (lowerMessage.includes("recommend") || lowerMessage.includes("should i") || lowerMessage.includes("next")) {
-      return `Based on your assessment, I recommend: ${assessment.result.recommendations.slice(0, 2).join(" ")} Would you like more details about any specific recommendation?`;
-    }
+Answer the patient's question about their assessment or endometriosis in general. Be concise, supportive, and informative.
 
-    // Symptoms
-    if (lowerMessage.includes("symptom")) {
-      return "Endometriosis symptoms can include pelvic pain, painful periods, pain during intercourse, heavy menstrual bleeding, and fertility issues. The severity and combination of symptoms vary greatly between individuals. If you're experiencing concerning symptoms, please consult a healthcare provider.";
-    }
+Question: ${userMessage}
 
-    // Treatment
-    if (lowerMessage.includes("treatment") || lowerMessage.includes("cure")) {
-      return "While there's no cure for endometriosis, treatments include pain medication, hormone therapy, and in some cases, surgery. Treatment plans are individualized based on symptoms, severity, and whether you're trying to conceive. A gynecologist specializing in endometriosis can help determine the best approach for your situation.";
-    }
+Answer:`;
 
-    // Confidence
-    if (lowerMessage.includes("confidence") || lowerMessage.includes("accurate")) {
-      return `The confidence level of your assessment is ${Math.round(assessment.result.confidence * 100)}%. This AI-powered tool analyzes multiple factors, but it's designed for informational purposes only. Always consult with a qualified healthcare provider for proper diagnosis and treatment.`;
+    try {
+      const output = await generatorRef.current(contextPrompt, {
+        max_new_tokens: 150,
+        temperature: 0.7,
+        do_sample: true,
+      });
+      return output[0].generated_text;
+    } catch (error) {
+      console.error("Generation error:", error);
+      return "I apologize, but I'm having trouble generating a response. Please try rephrasing your question.";
     }
-
-    // General endometriosis info
-    if (lowerMessage.includes("what is endometriosis") || lowerMessage.includes("endometriosis is")) {
-      return "Endometriosis is a condition where tissue similar to the uterine lining grows outside the uterus, commonly on ovaries, fallopian tubes, and pelvic tissues. This can cause pain, inflammation, and fertility issues. It affects approximately 10% of women of reproductive age.";
-    }
-
-    // Default response
-    return "I can help you understand your assessment results, explain endometriosis risk factors, discuss symptoms, and provide information about next steps. What would you like to know more about?";
   };
 
-  const handleSend = () => {
-    if (!input.trim()) return;
+  const handleSend = async () => {
+    if (!input.trim() || isLoading || modelLoading) return;
 
     const userMessage: Message = {
       role: "user",
@@ -94,17 +94,26 @@ const ChatInterface = ({ assessment, onClose }: Props) => {
     };
 
     setMessages((prev) => [...prev, userMessage]);
+    setInput("");
+    setIsLoading(true);
     
-    // Simulate AI response
-    setTimeout(() => {
+    try {
+      const response = await generateResponse(userMessage.content);
       const assistantMessage: Message = {
         role: "assistant",
-        content: generateResponse(input),
+        content: response,
       };
       setMessages((prev) => [...prev, assistantMessage]);
-    }, 500);
-
-    setInput("");
+    } catch (error) {
+      console.error("Error generating response:", error);
+      const errorMessage: Message = {
+        role: "assistant",
+        content: "I apologize, but I encountered an error. Please try again.",
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -130,6 +139,12 @@ const ChatInterface = ({ assessment, onClose }: Props) => {
 
       <ScrollArea ref={scrollRef} className="flex-1 p-4">
         <div className="space-y-4">
+          {modelLoading && (
+            <div className="flex items-center gap-2 text-muted-foreground text-sm">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span>Loading AI model... (first time may take a minute)</span>
+            </div>
+          )}
           {messages.map((message, idx) => (
             <div
               key={idx}
@@ -148,6 +163,13 @@ const ChatInterface = ({ assessment, onClose }: Props) => {
               </div>
             </div>
           ))}
+          {isLoading && (
+            <div className="flex justify-start">
+              <div className="bg-muted rounded-lg p-3">
+                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+              </div>
+            </div>
+          )}
         </div>
       </ScrollArea>
 
@@ -160,8 +182,12 @@ const ChatInterface = ({ assessment, onClose }: Props) => {
             placeholder="Ask about your assessment..."
             className="flex-1"
           />
-          <Button onClick={handleSend} size="icon">
-            <Send className="h-4 w-4" />
+          <Button onClick={handleSend} size="icon" disabled={isLoading || modelLoading}>
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Send className="h-4 w-4" />
+            )}
           </Button>
         </div>
       </div>
