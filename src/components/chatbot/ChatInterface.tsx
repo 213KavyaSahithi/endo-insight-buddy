@@ -17,6 +17,58 @@ interface Props {
   onClose: () => void;
 }
 
+// Lightweight medical knowledge base (used to ground responses)
+const knowledgeBase = [
+  {
+    title: "Common Symptoms",
+    keywords: ["pain", "period", "cramps", "pelvic", "dyspareunia", "sex", "bowel", "urinary", "fatigue"],
+    content:
+      "Endometriosis symptoms often include severe period pain (dysmenorrhea), chronic pelvic pain, pain with sex (dyspareunia), bowel or urinary pain around periods, heavy bleeding, spotting, bloating, and fatigue. Severity doesn't always match disease extent.",
+  },
+  {
+    title: "Risk Factors",
+    keywords: ["family", "genetic", "relative", "age", "menarche", "early", "short", "cycle", "bmi", "infertility", "ca125", "crp"],
+    content:
+      "Higher risk is associated with a family history in first‑degree relatives, early menarche, shorter cycles, low BMI in some studies, and certain inflammatory markers (e.g., elevated CRP) though CA‑125 is supportive not diagnostic.",
+  },
+  {
+    title: "Diagnosis",
+    keywords: ["diagnosis", "confirm", "scan", "ultrasound", "mri", "laparoscopy", "stage"],
+    content:
+      "Definitive diagnosis is via laparoscopy, but many cases are managed based on clinical features and imaging. Transvaginal ultrasound or MRI can detect ovarian endometriomas and deep disease; staging ranges I–IV and does not equal pain severity.",
+  },
+  {
+    title: "First‑line Management",
+    keywords: ["treatment", "manage", "pain relief", "nsaid", "hormone", "ocp", "pill", "progestin", "iud"],
+    content:
+      "First‑line options include NSAIDs for pain and hormonal suppression (combined oral contraceptives, continuous regimens; progestins like norethindrone or dienogest; levonorgestrel IUD). Tailor to symptoms, side‑effects, and pregnancy plans.",
+  },
+  {
+    title: "Fertility Considerations",
+    keywords: ["fertility", "pregnancy", "infertility", "conception", "ivf"],
+    content:
+      "For those trying to conceive, referral to a gynecologist or fertility specialist is recommended. Options include timed intercourse guidance, surgical management in selected cases, or assisted reproduction (e.g., IVF) depending on age and stage.",
+  },
+  {
+    title: "When to Seek Care",
+    keywords: ["urgent", "warning", "severe", "bleeding", "fever", "pregnant"],
+    content:
+      "Seek prompt medical care for severe uncontrolled pain, heavy bleeding causing weakness, fever with pelvic pain, new severe bowel/urinary symptoms, or if pregnant with abdominal pain.",
+  },
+  {
+    title: "Lifestyle & Self‑care",
+    keywords: ["diet", "exercise", "sleep", "stress", "heat", "physio"],
+    content:
+      "Many benefit from pelvic floor physiotherapy, gentle exercise, heat therapy, sleep hygiene, stress reduction, and anti‑inflammatory dietary patterns. Track symptoms to see what helps.",
+  },
+  {
+    title: "Follow‑up & Next Steps",
+    keywords: ["next", "follow", "referral", "specialist", "plan"],
+    content:
+      "Document symptom patterns, try first‑line therapies, and arrange follow‑up. Consider referral to an endometriosis‑experienced clinician if pain persists or fertility is a goal.",
+  },
+] as const;
+
 const ChatInterface = ({ assessment, onClose }: Props) => {
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -65,28 +117,55 @@ const ChatInterface = ({ assessment, onClose }: Props) => {
       return "AI model is still loading, please wait a moment...";
     }
 
-    const contextPrompt = `You are a helpful medical assistant specializing in endometriosis. 
-The patient has completed a risk assessment with the following results:
-- Risk Level: ${assessment.result.riskLevel}
-- Probability: ${Math.round(assessment.result.probability * 100)}%
-- Confidence: ${Math.round(assessment.result.confidence * 100)}%
-- Stage: ${assessment.result.stage}
-- Key Contributing Factors: ${assessment.result.factors.slice(0, 3).map(f => f.feature).join(", ")}
-- Recommendations: ${assessment.result.recommendations.join("; ")}
+    // Build patient-specific facts
+    const patientSummary = `Risk Level: ${assessment.result.riskLevel} | Probability: ${Math.round(
+      assessment.result.probability * 100
+    )}% | Confidence: ${Math.round(assessment.result.confidence * 100)}% | Stage: ${assessment.result.stage}\nTop Factors: ${assessment.result.factors
+      .slice(0, 3)
+      .map((f) => f.feature)
+      .join(", ")}\nRecommendations: ${assessment.result.recommendations.join("; ")}`;
 
-Answer the patient's question about their assessment or endometriosis in general. Be concise, supportive, and informative.
+    // Select relevant knowledge snippets (simple keyword scoring)
+    const q = userMessage.toLowerCase();
+    const ranked = (knowledgeBase as readonly any[])
+      .map((doc) => ({
+        doc,
+        score: (doc.keywords as string[]).reduce((s, k) => s + (q.includes(k) ? 1 : 0), 0),
+      }))
+      .sort((a, b) => b.score - a.score);
+    const topDocs = ranked.slice(0, 3).map((r) => r.doc);
+    const docsText = topDocs
+      .map((d: any, i: number) => `(${i + 1}) ${d.title}: ${d.content}`)
+      .join("\n\n");
 
-Question: ${userMessage}
+    // Recent conversation for context (skip the initial greeting)
+    const convo = messages
+      .slice(1)
+      .slice(-4)
+      .map((m) => `${m.role === "user" ? "User" : "Assistant"}: ${m.content}`)
+      .join("\n");
 
-Answer:`;
+    const contextPrompt = `You are a helpful medical assistant specializing in endometriosis.\n\n` +
+      `Follow these rules strictly:\n` +
+      `- Base answers on the Patient Summary and Context below.\n` +
+      `- If information is insufficient or question is unrelated, say so briefly and suggest a next step.\n` +
+      `- Keep answers concise, structured, and actionable. Use bullet points when listing.\n` +
+      `- Avoid definitive diagnoses. Add one short safety note at the end: 'This is not a diagnosis.'\n\n` +
+      `Patient Summary:\n${patientSummary}\n\n` +
+      `Context:\n${docsText || "(No specific context matched; answer using general endometriosis knowledge)"}\n\n` +
+      (convo ? `Conversation so far:\n${convo}\n\n` : "") +
+      `Question: ${userMessage}\n\nAnswer:`;
 
     try {
       const output = await generatorRef.current(contextPrompt, {
-        max_new_tokens: 150,
-        temperature: 0.7,
+        max_new_tokens: 220,
+        temperature: 0.6,
         do_sample: true,
       });
-      return output[0].generated_text;
+      let text = output[0].generated_text as string;
+      const idx = text.lastIndexOf("Answer:");
+      if (idx !== -1) text = text.slice(idx + 7).trim();
+      return text.trim();
     } catch (error) {
       console.error("Generation error:", error);
       return "I apologize, but I'm having trouble generating a response. Please try rephrasing your question.";
