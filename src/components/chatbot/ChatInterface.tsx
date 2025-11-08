@@ -6,6 +6,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Send, X, Loader2 } from "lucide-react";
 import { AssessmentHistory } from "@/types/assessment";
 import { pipeline } from "@huggingface/transformers";
+import { buildResultExplanation } from "./utils";
 
 interface Message {
   role: "user" | "assistant";
@@ -182,6 +183,31 @@ const ChatInterface = ({ assessment, onClose }: Props) => {
 
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
+
+    // Instant explanation path for result-related queries
+    const qLower = userMessage.content.trim().toLowerCase();
+    const wantsExplanation =
+      (/(\bexplain\b|\bsummary\b|\bsummarize\b|\bsummarise\b|\binterpret\b|break\s*down|detail(s)?)/.test(qLower) &&
+        /(\bresult\b|\bassessment\b|\breport\b|\bscore\b)/.test(qLower)) ||
+      [
+        "explain my result",
+        "explain result",
+        "explain the result",
+        "tell me about my result",
+        "explain my assessment",
+        "summarize my result",
+        "summary of my result",
+      ].some((p) => qLower.includes(p));
+
+    if (wantsExplanation) {
+      const assistantMessage: Message = {
+        role: "assistant",
+        content: buildResultExplanation(assessment),
+      };
+      setMessages((prev) => [...prev, assistantMessage]);
+      return;
+    }
+
     setIsLoading(true);
     
     try {
