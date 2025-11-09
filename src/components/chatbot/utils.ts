@@ -40,6 +40,11 @@ const faqDatabase: FAQPattern[] = [
       /what\s+(do|does)\s+my\s+results?\s+mean/i,
       /interpret\s+my\s+results?/i,
       /understand\s+my\s+results?/i,
+      /explain\s+my\s+results?/i,
+      /tell\s+me\s+about\s+my\s+results?/i,
+      /what\s+(is|are)\s+my\s+results?/i,
+      /summary\s+of\s+my\s+results?/i,
+      /results?\s+explanation/i,
     ],
     response: (assessment) => {
       if (!assessment) return "Please provide your assessment details.";
