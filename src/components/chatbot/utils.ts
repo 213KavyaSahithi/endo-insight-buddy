@@ -114,8 +114,8 @@ const faqDatabase: FAQPattern[] = [
       /need.*specialist/i,
     ],
     response: (assessment) => {
-      const risk = assessment?.result.riskLevel || "moderate";
-      return `${risk === "high" ? "Yes, you should see a gynecologist soon" : risk === "moderate" ? "Yes, scheduling a gynecologist appointment is recommended" : "Consider seeing a gynecologist if symptoms persist"}.\n\nWhen to seek care:\n- Severe period pain interfering with daily life\n- Pain with sex, bowel movements, or urination\n- Heavy bleeding or irregular cycles\n- Difficulty conceiving after 6-12 months\n- Any of your concerning symptoms\n\nWhat to bring to appointment:\n- This assessment and your symptom history\n- Menstrual cycle tracking (dates, flow, pain levels)\n- List of current medications and treatments tried\n- Family history of endometriosis\n- Questions about diagnosis and treatment options\n\nFinding the right doctor: Look for a gynecologist with endometriosis experience or consider a specialist in reproductive endocrinology or pelvic pain.`;
+      const risk = assessment?.result.riskLevel || "medium";
+      return `${risk === "high" ? "Yes, you should see a gynecologist soon" : risk === "medium" ? "Yes, scheduling a gynecologist appointment is recommended" : "Consider seeing a gynecologist if symptoms persist"}.\n\nWhen to seek care:\n- Severe period pain interfering with daily life\n- Pain with sex, bowel movements, or urination\n- Heavy bleeding or irregular cycles\n- Difficulty conceiving after 6-12 months\n- Any of your concerning symptoms\n\nWhat to bring to appointment:\n- This assessment and your symptom history\n- Menstrual cycle tracking (dates, flow, pain levels)\n- List of current medications and treatments tried\n- Family history of endometriosis\n- Questions about diagnosis and treatment options\n\nFinding the right doctor: Look for a gynecologist with endometriosis experience or consider a specialist in reproductive endocrinology or pelvic pain.`;
     },
   },
   {
