@@ -22,10 +22,10 @@ const Landing = () => {
       <section className="container mx-auto px-4 py-20 text-center">
         <div className="max-w-3xl mx-auto">
           <h1 className="text-5xl font-bold mb-6 text-foreground">
-            AI-Powered Endometriosis Risk Assessment
+            Endometriosis Risk Assessment
           </h1>
           <p className="text-xl text-muted-foreground mb-8">
-            Advanced machine learning analysis to help identify potential endometriosis risk factors 
+            Comprehensive analysis to help identify potential endometriosis risk factors 
             based on your symptoms, medical history, and biomarkers.
           </p>
           <div className="flex gap-4 justify-center">
@@ -47,9 +47,9 @@ const Landing = () => {
         <div className="grid md:grid-cols-3 gap-6">
           <Card className="p-6">
             <Brain className="h-12 w-12 text-primary mb-4" />
-            <h3 className="text-xl font-semibold mb-2 text-foreground">AI-Powered Analysis</h3>
+            <h3 className="text-xl font-semibold mb-2 text-foreground">Clinical Analysis</h3>
             <p className="text-muted-foreground">
-              Machine learning model trained on clinical data to provide accurate risk predictions.
+              Evidence-based assessment model using clinical guidelines to provide accurate risk predictions.
             </p>
           </Card>
           
