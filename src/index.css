@@ -113,14 +113,83 @@ All colors MUST be HSL.
     background-attachment: fixed;
     background-position: center;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    position: relative;
+    overflow-x: hidden;
+  }
+  
+  /* Animated gradient overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      135deg,
+      hsl(270 70% 40% / 0.1),
+      hsl(190 70% 50% / 0.15),
+      hsl(230 60% 35% / 0.1),
+      hsl(270 70% 40% / 0.1)
+    );
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+  
+  body > * {
+    position: relative;
+    z-index: 1;
   }
   
   /* Glassmorphism utilities */
   .glass {
     @apply bg-card/40 backdrop-blur-xl border border-border/50;
+    box-shadow: 0 8px 32px 0 hsl(270 70% 20% / 0.2);
   }
   
   .glass-strong {
     @apply bg-card/60 backdrop-blur-2xl border border-border/60;
+    box-shadow: 0 8px 32px 0 hsl(270 70% 20% / 0.3);
+  }
+  
+  /* Shimmer effect */
+  .shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .shimmer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      hsl(270 80% 70% / 0.2),
+      transparent
+    );
+    animation: shimmer 3s infinite;
+  }
+  
+  /* Glow effect for cards */
+  .glow {
+    box-shadow: 
+      0 0 20px hsl(270 70% 60% / 0.3),
+      0 0 40px hsl(190 70% 60% / 0.2);
+  }
+  
+  .glow-hover {
+    transition: box-shadow 0.3s ease;
+  }
+  
+  .glow-hover:hover {
+    box-shadow: 
+      0 0 30px hsl(270 70% 60% / 0.5),
+      0 0 60px hsl(190 70% 60% / 0.3);
   }
 }
