@@ -26,7 +26,7 @@ export const ThemeToggle = () => {
       variant="outline"
       size="icon"
       onClick={toggleTheme}
-      className="fixed top-4 right-4 z-50"
+      className="fixed top-4 left-4 z-50"
       aria-label="Toggle theme"
     >
       {theme === "light" ? (
