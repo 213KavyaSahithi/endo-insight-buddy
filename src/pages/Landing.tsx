@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { Activity, Brain, FileText, ShieldCheck, TrendingUp } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Landing = () => {
   return (
@@ -12,9 +13,12 @@ const Landing = () => {
           <div className="flex items-center gap-2">
             <span className="text-xl font-bold text-foreground">EndoAI</span>
           </div>
-          <Button asChild>
-            <Link to="/assessment">Start Assessment</Link>
-          </Button>
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <Button asChild>
+              <Link to="/assessment">Start Assessment</Link>
+            </Button>
+          </div>
         </nav>
       </header>
 
